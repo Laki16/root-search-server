@@ -4,5 +4,9 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Colorful.Console" Version="1.2.11" />
+  </ItemGroup>
+
 
 </Project>
