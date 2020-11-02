@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using ApiServer.Models;
+
 namespace ApiServer
 {
 	public enum SearchEngineTypes
@@ -15,6 +18,6 @@ namespace ApiServer
 
 		bool IsAvailable { get; set; }
 
-		void Search(string keyword);
+		List<SearchResultObject> Search(string keyword);
 	}
 }

@@ -1,5 +1,27 @@
+using System.Collections.Generic;
+
 namespace ApiServer.Models
 {
+	public struct SearchResultObject
+	{
+		/// <summary>
+		/// 제목
+		/// </summary>
+		public string Title { get; set; }
+		/// <summary>
+		/// 부가 내용
+		/// </summary>
+		public string Snippet { get; set; }
+		/// <summary>
+		/// URL 링크
+		/// </summary>
+		public string Link { get; set; }
+		/// <summary>
+		/// 썸네일용 이미지 src
+		/// </summary>
+		public string Thumbnail { get; set; }
+	}
+
 	/// <summary>
 	/// 검색 결과 아이템
 	/// </summary>
@@ -31,6 +53,6 @@ namespace ApiServer.Models
 		/// <summary>
 		/// 검색 결과
 		/// </summary>
-		public string[] Results { get; set; }
+		public List<SearchResultObject> Results { get; set; }
 	}
 }

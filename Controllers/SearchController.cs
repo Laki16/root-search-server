@@ -17,11 +17,7 @@ namespace ApiServer.Controllers
 		[HttpGet("{keyword}")]
 		public async Task<ActionResult<SearchResultDTO>> GetSearchResult(string keyword)
 		{
-			var results = new string[]
-			{
-				"testa",
-				"testb"
-			};
+			var results = SearchManager.Instance.Search(keyword);
 
 			return new SearchResultDTO{
 				KeyWord = keyword,

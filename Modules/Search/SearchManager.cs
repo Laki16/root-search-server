@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using ApiServer.Models;
 
 namespace ApiServer
 {
@@ -44,11 +45,11 @@ namespace ApiServer
 			return null;
 		}
 
-		public void Search(string keyword)
+		public List<SearchResultObject> Search(string keyword)
 		{
 			var module = DecideSearchModule();
 
-			module?.Search(keyword);
+			return module?.Search(keyword);
 		}
 	}
 }

@@ -33,7 +33,12 @@ namespace ApiServer
 				ApiKey = apiKey
 			});
 
-		public void Search(string keyword)
+		/// <summary>
+		/// 검색 결과를 리스트로 반환
+		/// TODO: 리스트 풀링하도록 수정
+		/// </summary>
+		/// <param name="keyword">검색할 키워드</param>
+		public List<SearchResultObject> Search(string keyword)
 		{
 			CseResource.ListRequest listRequest = customSearchService.Cse.List();
 
@@ -42,7 +47,29 @@ namespace ApiServer
 
 			Console.Write($"Start searching... {keyword}");
 
-			var results = listRequest.Execute().Items;
+			var items = listRequest.Execute().Items;
+
+			var results = new List<SearchResultObject>();
+
+			foreach (var item in items)
+			{
+				string thumbnail = null;
+
+				// if (item.Pagemap.TryGetValue("cse_thumbnail", out var cse))
+				// {
+				// 	thumbnail = (string)cse.GetType().GetProperty("src").GetValue(cse);
+				// }
+
+				results.Add(new SearchResultObject
+				{
+					Title = item.Title,
+					Snippet = item.Snippet,
+					Link = item.Link,
+					Thumbnail = thumbnail
+				});
+			}
+
+			return results;
 		}
 	}
 }
