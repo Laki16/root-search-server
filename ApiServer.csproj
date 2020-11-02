@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Colorful.Console" Version="1.2.11" />
+    <PackageReference Include="Google.Apis.Customsearch.v1" Version="1.49.0.2084" />
   </ItemGroup>
 
 
