@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using ApiServer.Models;
 
 namespace ApiServer
 {
@@ -20,7 +21,10 @@ namespace ApiServer
 		{
 			services.AddControllers();
 
-			SearchManager.Instance.Initialize();
+			// Register the search moudle configuration instance
+			services.Configure<SearchEngineApiSettings>(
+				Configuration.GetSection("SearchEngineApiSettings")
+			);
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

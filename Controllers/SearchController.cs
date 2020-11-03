@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Mvc;
 using ApiServer.Models;
 
@@ -10,6 +11,19 @@ namespace ApiServer.Controllers
 	[Route("search")]
 	public class SearchController : ControllerBase
 	{
+		/// <summary>
+		/// api settings for search modules
+		/// </summary>
+		private readonly SearchEngineApiSettings _apiSettings;
+
+		public SearchController(IOptions<SearchEngineApiSettings> apiSettingsAccessor)
+		{
+			// inject IOptions
+			_apiSettings = apiSettingsAccessor.Value;
+
+			SearchManager.Instance.Initialize(_apiSettings);
+		}
+
 		/// <summary>
 		/// Get result of search by {keyword}
 		/// </summary>

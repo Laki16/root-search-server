@@ -18,6 +18,8 @@ namespace ApiServer
 
 		bool IsAvailable { get; set; }
 
+		bool Initialize(SearchEngineApiSettings apiSettings);
+
 		List<SearchResultObject> Search(string keyword);
 	}
 }

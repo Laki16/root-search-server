@@ -10,20 +10,45 @@ namespace ApiServer
 
 		public static SearchManager Instance => _instance;
 
-		private bool _isInitialized = false;
+		/// <summary>
+		/// Api settings for search modules
+		/// </summary>
+		private SearchEngineApiSettings _apiSettings;
 
+		/// <summary>
+		/// List of available search modules
+		/// </summary>
 		private List<ISearchModule> _searchModules = new List<ISearchModule>();
 
-		public void Initialize()
+		public void Initialize(SearchEngineApiSettings apiSettings)
 		{
-			if (_isInitialized)
+			_apiSettings = apiSettings;
+
+			TryAddSearchModule(GoogleCustomSearchModule.Instance);
+		}
+
+		/// <summary>
+		/// Try to activate search module and add to available search module list.
+		/// </summary>
+		/// <param name="searchModule">target search module</param>
+		/// <returns>true if successfully added</returns>
+		private bool TryAddSearchModule(ISearchModule searchModule)
+		{
+			// error: already added
+			if (_searchModules.Contains(searchModule))
 			{
-				return;
+				return false;
 			}
 
-			_searchModules.Add(GoogleCustomSearchModule.Instance);
+			// error: couldn't initialize
+			if (!searchModule.Initialize(_apiSettings))
+			{
+				return false;
+			}
 
-			_isInitialized = true;
+			_searchModules.Add(searchModule);
+
+			return true;
 		}
 
 		private ISearchModule DecideSearchModule()
@@ -47,6 +72,7 @@ namespace ApiServer
 
 		public List<SearchResultObject> Search(string keyword)
 		{
+			// TODO: handling for not found available module
 			var module = DecideSearchModule();
 
 			return module?.Search(keyword);

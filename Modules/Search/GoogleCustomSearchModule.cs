@@ -15,7 +15,7 @@ namespace ApiServer
 
 		public SearchEngineTypes SearchEngingType => SearchEngineTypes.GoogleCustomJson;
 
-		private bool _isAvailable = true;
+		private bool _isAvailable = false;
 
 		public bool IsAvailable
 		{
@@ -23,15 +23,30 @@ namespace ApiServer
 			set => _isAvailable = value;
 		}
 
-		private const string apiKey = "APIKEY";
+		private string cx;
 
-		private const string cx = "CX";
+		private CustomsearchService customSearchService;
 
-		private CustomsearchService customSearchService =
-			new CustomsearchService(new Google.Apis.Services.BaseClientService.Initializer()
+		public bool Initialize(SearchEngineApiSettings apiSettings)
+		{
+			try
 			{
-				ApiKey = apiKey
-			});
+				customSearchService = new CustomsearchService(new Google.Apis.Services.BaseClientService.Initializer()
+				{
+					ApiKey = apiSettings.googleCustomSearchApiSettings.ApiKey
+				});
+
+				cx = apiSettings.googleCustomSearchApiSettings.Cx;
+
+				_isAvailable = true;
+
+				return true;
+			} catch (Exception e) {
+				_isAvailable = false;
+
+				return false;
+			}
+		}
 
 		/// <summary>
 		/// 검색 결과를 리스트로 반환
