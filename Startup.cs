@@ -21,7 +21,18 @@ namespace ApiServer
 		{
 			services.AddControllers();
 
-			// Register the search moudle configuration instance
+			// Register the redis cache.
+			services.AddStackExchangeRedisCache(options => {
+				var redisSettings = Configuration.GetSection("RedisSettings");
+
+				options.Configuration = $"{redisSettings.GetValue<string>("Host")}:{redisSettings.GetValue<string>("Port")}";
+				options.InstanceName = redisSettings.GetValue<string>("InstanceName");
+			});
+
+			// Register custom cache dependency.
+			services.AddScoped<ICacheManager, CacheManager>();
+
+			// Register the search moudle configuration instance.
 			services.Configure<SearchEngineApiSettings>(
 				Configuration.GetSection("SearchEngineApiSettings")
 			);

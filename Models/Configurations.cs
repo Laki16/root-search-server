@@ -19,4 +19,22 @@ namespace ApiServer.Models
 		/// </summary>
 		public string Cx { get; set; }
 	}
+
+	public class RedisSettings
+	{
+		/// <summary>
+		/// Redis Host
+		/// </summary>
+		public string Host { get; set; }
+
+		/// <summary>
+		/// Redis Port
+		/// </summary>
+		public int Port { get; set; }
+
+		/// <summary>
+		/// Prefix automatically added to any key written to the cache
+		/// </summary>
+		public string InstanceName { get; set; }
+	}
 }

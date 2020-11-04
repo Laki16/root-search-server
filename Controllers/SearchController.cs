@@ -26,14 +26,25 @@ namespace ApiServer.Controllers
 
 		/// <summary>
 		/// Get result of search by {keyword}
+		///
+		/// injected cache dependency via FromServices attribute.
 		/// </summary>
 		/// <param name="keyword">search target</param>
 		[HttpGet("{keyword}")]
-		public async Task<ActionResult<SearchResultDTO>> GetSearchResult(string keyword)
+		public async Task<ActionResult<SearchResultDTO>> GetSearchResult([FromServices] ICacheManager cache, string keyword)
 		{
-			var results = SearchManager.Instance.Search(keyword);
+			List<SearchResultObject> results = await cache.GetAsync(keyword);
 
-			return new SearchResultDTO{
+			if (results == null)
+			{
+				results = SearchManager.Instance.Search(keyword);
+
+				// TODO: search failed handling
+				cache.SetAsync(keyword, results);
+			}
+
+			return new SearchResultDTO
+			{
 				KeyWord = keyword,
 				Results = results,
 			};
