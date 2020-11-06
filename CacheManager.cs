@@ -14,14 +14,14 @@ namespace ApiServer
 			_cache = distributedCache;
 		}
 
-		public async Task<List<SearchResultObject>> GetAsync(string key)
+		public async Task<SearchResultCache> GetAsync(string key)
 		{
-			return await _cache.GetAsync<List<SearchResultObject>>(key);
+			return await _cache.GetAsync<SearchResultCache>(key);
 		}
 
-		public async void SetAsync(string key, List<SearchResultObject> results)
+		public async void SetAsync(string key, SearchResultCache result)
 		{
-			await _cache.SetAsync<List<SearchResultObject>>(key, results);
+			await _cache.SetAsync<SearchResultCache>(key, result);
 		}
 	}
 }

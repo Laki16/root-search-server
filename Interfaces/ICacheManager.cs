@@ -6,8 +6,8 @@ namespace ApiServer
 {
 	public interface ICacheManager
 	{
-		Task<List<SearchResultObject>> GetAsync(string key);
+		Task<SearchResultCache> GetAsync(string key);
 
-		void SetAsync(string key, List<SearchResultObject> result);
+		void SetAsync(string key, SearchResultCache result);
 	}
 }

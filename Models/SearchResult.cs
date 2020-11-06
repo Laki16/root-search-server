@@ -43,6 +43,19 @@ namespace ApiServer.Models
 		public string SessionKey { get; set; }
 	}
 
+	public class SearchResultCache
+	{
+		/// <summary>
+		/// 연관 검색어
+		/// </summary>
+		public List<string> AssociativeWords { get; set; }
+
+		/// <summary>
+		/// 검색 결과
+		/// </summary>
+		public List<SearchResultObject> Results { get; set; }
+	}
+
 	public class SearchResultDTO
 	{
 		/// <summary>
