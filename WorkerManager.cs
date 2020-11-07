@@ -1,14 +1,19 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Primitives;
+using Microsoft.Extensions.Primitive;
+using System.Linq;
 using ApiServer.Models;
 
 namespace ApiServer
 {
-	public class SearchManager
+	public class WorkerManager
 	{
-		private static SearchManager _instance = new SearchManager();
+		private static WorkerManager _instance = new WorkerManager();
 
-		public static SearchManager Instance => _instance;
+		public static WorkerManager Instance => _instance;
 
 		/// <summary>
 		/// Api settings for search modules
@@ -19,6 +24,8 @@ namespace ApiServer
 		/// List of available search modules
 		/// </summary>
 		private List<ISearchModule> _searchModules = new List<ISearchModule>();
+
+		private static char[] Separators = new char[]{' '};
 
 		public void Initialize(SearchEngineApiSettings apiSettings)
 		{
@@ -70,12 +77,37 @@ namespace ApiServer
 			return null;
 		}
 
-		public List<SearchResultObject> Search(string keyword)
+		public async Task<List<SearchResultObject>> GetResult(ICacheManager cache, string keyword)
 		{
-			// TODO: handling for not found available module
-			var module = DecideSearchModule();
+			SearchResultCache cached = await cache.GetAsync(keyword);
 
-			return module?.Search(keyword);
+			// 검색 결과 캐시가 없다면
+			if (cached == null)
+			{
+				cached = new SearchResultCache();
+
+				// TODO: handling for not found available module
+				cached.Results = DecideSearchModule()?.Search(keyword);
+
+				var scores = new ConcurrentDictionary<string, uint>();
+
+				// TODO: use worker
+				foreach (var result in cached.Results)
+				{
+					var tokens = new StringTokenizer(result.Snippet, Separators);
+
+					tokens.Score(ref scores);
+				}
+
+				var sorted = scores.OrderByDescending(item => item.Value);
+
+				cached.AssociativeWords = sorted.Take(5).Select(x => x.Key).ToList();;
+
+				// TODO: search failed handling
+				cache.SetAsync(keyword, cached);
+			}
+
+			return cached.Results;
 		}
 	}
 }
