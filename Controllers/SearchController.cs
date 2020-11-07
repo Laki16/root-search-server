@@ -20,10 +20,18 @@ namespace ApiServer.Controllers
 		/// </summary>
 		private readonly SearchEngineApiSettings _apiSettings;
 
-		public SearchController(IOptions<SearchEngineApiSettings> apiSettingsAccessor)
+		/// <summary>
+		/// redis distributed cache for search results
+		/// </summary>
+		private readonly ICacheManager _cache;
+
+		public SearchController(IOptions<SearchEngineApiSettings> apiSettingsAccessor, ICacheManager cache)
 		{
 			// inject IOptions
 			_apiSettings = apiSettingsAccessor.Value;
+
+			// inject cache
+			_cache = cache;
 
 			SearchManager.Instance.Initialize(_apiSettings);
 		}
@@ -32,14 +40,12 @@ namespace ApiServer.Controllers
 
 		/// <summary>
 		/// Get result of search by {keyword}
-		///
-		/// injected cache dependency via FromServices attribute.
 		/// </summary>
 		/// <param name="keyword">search target</param>
 		[HttpGet("{keyword}")]
-		public async Task<ActionResult<SearchResultDTO>> GetSearchResult([FromServices] ICacheManager cache, string keyword)
+		public async Task<ActionResult<SearchResultDTO>> GetSearchResult(string keyword)
 		{
-			SearchResultCache cached = await cache.GetAsync(keyword);
+			SearchResultCache cached = await _cache.GetAsync(keyword);
 
 			// 검색 결과 캐시가 없다면
 			if (cached == null)
@@ -63,7 +69,7 @@ namespace ApiServer.Controllers
 				cached.AssociativeWords = sorted.Take(5).Select(x => x.Key).ToList();;
 
 				// TODO: search failed handling
-				cache.SetAsync(keyword, cached);
+				_cache.SetAsync(keyword, cached);
 			}
 
 			return new SearchResultDTO
