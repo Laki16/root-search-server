@@ -9,25 +9,10 @@ namespace ApiServer.Controllers
 	[Route("search")]
 	public class SearchController : ControllerBase
 	{
-		/// <summary>
-		/// api settings for search modules
-		/// </summary>
-		private readonly SearchEngineApiSettings _apiSettings;
-
-		/// <summary>
-		/// redis distributed cache for search results
-		/// </summary>
-		private readonly ICacheManager _cache;
-
 		public SearchController(IOptions<SearchEngineApiSettings> apiSettingsAccessor, ICacheManager cache)
 		{
-			// inject IOptions
-			_apiSettings = apiSettingsAccessor.Value;
-
-			// inject cache
-			_cache = cache;
-
-			WorkerManager.Instance.Initialize(_apiSettings);
+			// init worker manager with dependencies injection.
+			WorkerManager.Instance.Initialize(apiSettingsAccessor.Value, cache);
 		}
 
 		/// <summary>
@@ -37,7 +22,7 @@ namespace ApiServer.Controllers
 		[HttpGet("{keyword}")]
 		public async Task<ActionResult<SearchResultDTO>> GetSearchResult(string keyword)
 		{
-			var results = await WorkerManager.Instance.GetResult(_cache, keyword);
+			var results = await WorkerManager.Instance.GetResult(keyword);
 
 			return new SearchResultDTO
 			{

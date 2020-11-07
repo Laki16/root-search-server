@@ -21,15 +21,24 @@ namespace ApiServer
 		private SearchEngineApiSettings _apiSettings;
 
 		/// <summary>
+		/// redis distributed cache for search results
+		/// </summary>
+		private ICacheManager _cache;
+
+		/// <summary>
 		/// List of available search modules
 		/// </summary>
 		private List<ISearchModule> _searchModules = new List<ISearchModule>();
 
-		private static char[] Separators = new char[]{' '};
+		private static char[] Separators = new char[] { ' ' };
 
-		public void Initialize(SearchEngineApiSettings apiSettings)
+		public void Initialize(SearchEngineApiSettings apiSettings, ICacheManager cache)
 		{
+			// inject IOptions
 			_apiSettings = apiSettings;
+
+			// inject cache
+			_cache = cache;
 
 			TryAddSearchModule(GoogleCustomSearchModule.Instance);
 		}
@@ -60,7 +69,8 @@ namespace ApiServer
 
 		private ISearchModule DecideSearchModule()
 		{
-			if (_searchModules == null || _searchModules.Count == 0) {
+			if (_searchModules == null || _searchModules.Count == 0)
+			{
 				return null;
 			}
 
@@ -77,9 +87,9 @@ namespace ApiServer
 			return null;
 		}
 
-		public async Task<List<SearchResultObject>> GetResult(ICacheManager cache, string keyword)
+		public async Task<List<SearchResultObject>> GetResult(string keyword)
 		{
-			SearchResultCache cached = await cache.GetAsync(keyword);
+			SearchResultCache cached = await _cache.GetAsync(keyword);
 
 			// 검색 결과 캐시가 없다면
 			if (cached == null)
@@ -101,10 +111,10 @@ namespace ApiServer
 
 				var sorted = scores.OrderByDescending(item => item.Value);
 
-				cached.AssociativeWords = sorted.Take(5).Select(x => x.Key).ToList();;
+				cached.AssociativeWords = sorted.Take(5).Select(x => x.Key).ToList(); ;
 
 				// TODO: search failed handling
-				cache.SetAsync(keyword, cached);
+				_cache.SetAsync(keyword, cached);
 			}
 
 			return cached.Results;
