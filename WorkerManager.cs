@@ -87,7 +87,7 @@ namespace ApiServer
 			return null;
 		}
 
-		public async Task<List<SearchResultObject>> GetResult(string keyword)
+		public async Task<SearchResultCache> GetResult(string keyword)
 		{
 			SearchResultCache cached = await _cache.GetAsync(keyword);
 
@@ -117,7 +117,7 @@ namespace ApiServer
 				_cache.SetAsync(keyword, cached);
 			}
 
-			return cached.Results;
+			return cached;
 		}
 	}
 }
