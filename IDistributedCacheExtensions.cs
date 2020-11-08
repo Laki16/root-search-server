@@ -24,8 +24,8 @@ namespace Microsoft.Extensions.Caching.Distributed
 			// decide cache entry options
 			var entryOptions = options ??
 				new DistributedCacheEntryOptions()
-					.SetAbsoluteExpiration(DateTime.Now.AddMinutes(10))
-					.SetSlidingExpiration(TimeSpan.FromMinutes(3));
+					.SetAbsoluteExpiration(DateTime.Now.AddHours(10))
+					.SetSlidingExpiration(TimeSpan.FromHours(5));
 
 			var serializedResult = JsonConvert.SerializeObject(value);
 
