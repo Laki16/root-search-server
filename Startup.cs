@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Cors;
 using ApiServer.Models;
 
 namespace ApiServer
@@ -19,6 +20,14 @@ namespace ApiServer
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
+			services.AddCors(options => {
+				options.AddPolicy("DevelopPolicy", builder => {
+					// builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+					builder.WithOrigins("127.0.0.1:3000")
+						.WithMethods("GET");
+				});
+			});
+
 			services.AddControllers();
 
 			// Register the redis cache.
@@ -49,6 +58,8 @@ namespace ApiServer
 			app.UseHttpsRedirection();
 
 			app.UseRouting();
+
+			app.UseCors("DevelopPolicy");
 
 			app.UseAuthorization();
 

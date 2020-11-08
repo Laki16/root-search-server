@@ -2,11 +2,13 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Cors;
 using ApiServer.Models;
 using System.Text;
 
 namespace ApiServer.Controllers
 {
+	[EnableCors("DevelopPolicy")]
 	[ApiController]
 	[Route("search")]
 	public class SearchController : ControllerBase
