@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Google.Apis.Customsearch.v1;
 using ApiServer.Models;
+using Newtonsoft.Json.Linq;
+using System.Linq;
 
 namespace ApiServer
 {
@@ -26,6 +28,13 @@ namespace ApiServer
 		private string cx;
 
 		private CustomsearchService customSearchService;
+
+		private readonly IReadOnlyList<string> thumbnailKeyCandidates = new List<string>
+		{
+			"thumbnail",
+			"cse_thumbnail",
+			"cse_image"
+		}.AsReadOnly();
 
 		public bool Initialize(SearchEngineApiSettings apiSettings)
 		{
@@ -70,10 +79,37 @@ namespace ApiServer
 			{
 				string thumbnail = null;
 
-				// if (item.Pagemap.TryGetValue("cse_thumbnail", out var cse))
-				// {
-				// 	thumbnail = (string)cse.GetType().GetProperty("src").GetValue(cse);
-				// }
+				// JObject 에서 썸네일 추출
+				foreach (var key in thumbnailKeyCandidates)
+				{
+					// 이미 썸네일을 찾았다면 탈출
+					if (!string.IsNullOrEmpty(thumbnail))
+					{
+						break;
+					}
+
+					// 후보키를 JObject에서 찾을 수 없다면 스킵
+					if (!item.Pagemap.TryGetValue(key, out var jArrayObject))
+					{
+						continue;
+					}
+
+					var jsonArray = JArray.FromObject(jArrayObject);
+					foreach(var jsonObj in jsonArray)
+					{
+						dynamic obj = jsonObj;
+						string src = obj.src;
+
+						if (src == null)
+						{
+							continue;
+						}
+
+						// 찾은 썸네일 저장하고 탈출
+						thumbnail = src;
+						break;
+					}
+				}
 
 				results.Add(new SearchResultObject
 				{
