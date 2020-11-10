@@ -32,9 +32,20 @@ namespace ApiServer.Controllers
 			Response.Headers.Add("Access-Control-Allow-Methods", "GET");
 			// Response.Headers.Add("Access-Control-Allow-Credentials", "true");
 			Response.Headers.Add("Content-Type", "text/event-stream");
-			Response.StatusCode = 200;
 
-			ResultManager.Instance.AddConnection(Request.HttpContext.Connection.Id, keyword, Response);
+			if (ResultManager.Instance.AddConnection(Request.HttpContext.Connection.Id, keyword, Response))
+			{
+				Response.StatusCode = 200;
+			}
+			else
+			{
+				// Duplicated client secret error! Close connection and return.
+				Response.StatusCode = 502;
+
+				Response.Body.Close();
+
+				return;
+			}
 
 			try
 			{
