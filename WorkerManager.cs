@@ -119,7 +119,7 @@ namespace ApiServer
 
 				var sorted = scores.OrderByDescending(item => item.Value);
 
-				cached.AssociativeWords = sorted.Take(5).Select(x => x.Key).ToList(); ;
+				cached.AssociativeWords = sorted.Take(5).Select(x => x.Key).ToList();
 
 				// TODO: search failed handling
 				_cache.SetAsync(keyword, cached);
