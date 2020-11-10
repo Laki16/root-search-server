@@ -50,7 +50,9 @@ namespace ApiServer
 				_isAvailable = true;
 
 				return true;
-			} catch (Exception e) {
+			}
+			catch (Exception e)
+			{
 				_isAvailable = false;
 
 				return false;
@@ -79,35 +81,38 @@ namespace ApiServer
 			{
 				string thumbnail = null;
 
-				// JObject 에서 썸네일 추출
-				foreach (var key in thumbnailKeyCandidates)
+				if (item.Pagemap != null)
 				{
-					// 이미 썸네일을 찾았다면 탈출
-					if (!string.IsNullOrEmpty(thumbnail))
+					// JObject 에서 썸네일 추출
+					foreach (var key in thumbnailKeyCandidates)
 					{
-						break;
-					}
+						// 이미 썸네일을 찾았다면 탈출
+						if (!string.IsNullOrEmpty(thumbnail))
+						{
+							break;
+						}
 
-					// 후보키를 JObject에서 찾을 수 없다면 스킵
-					if (!item.Pagemap.TryGetValue(key, out var jArrayObject))
-					{
-						continue;
-					}
-
-					var jsonArray = JArray.FromObject(jArrayObject);
-					foreach(var jsonObj in jsonArray)
-					{
-						dynamic obj = jsonObj;
-						string src = obj.src;
-
-						if (src == null)
+						// 후보키를 JObject에서 찾을 수 없다면 스킵
+						if (!item.Pagemap.TryGetValue(key, out var jArrayObject))
 						{
 							continue;
 						}
 
-						// 찾은 썸네일 저장하고 탈출
-						thumbnail = src;
-						break;
+						var jsonArray = JArray.FromObject(jArrayObject);
+						foreach (var jsonObj in jsonArray)
+						{
+							dynamic obj = jsonObj;
+							string src = obj.src;
+
+							if (src == null)
+							{
+								continue;
+							}
+
+							// 찾은 썸네일 저장하고 탈출
+							thumbnail = src;
+							break;
+						}
 					}
 				}
 
