@@ -24,7 +24,7 @@ namespace ApiServer
 		/// <param name="reqKeyword">요청한 검색 키워드</param>
 		/// <param name="response">요청한 action의 HttpResponse</param>
 		/// <returns>커넥션이 정상적으로 등록되었다면 true</returns>
-		public bool AddConnection(string secret, string reqKeyword, HttpResponse response)
+		public bool TryAddConnection(string secret, string reqKeyword, HttpResponse response)
 		{
 			// 중복된 키로 요청이 들어오면 이전 커넥션 캔슬 (자동으로 Dispose 될 것)
 			if (connections.TryRemove(secret, out var connection))

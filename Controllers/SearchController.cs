@@ -33,7 +33,7 @@ namespace ApiServer.Controllers
 			// Response.Headers.Add("Access-Control-Allow-Credentials", "true");
 			Response.Headers.Add("Content-Type", "text/event-stream");
 
-			if (ResultManager.Instance.AddConnection(Request.HttpContext.Connection.Id, keyword, Response))
+			if (ResultManager.Instance.TryAddConnection(Request.HttpContext.Connection.Id, keyword, Response))
 			{
 				Response.StatusCode = 200;
 			}
