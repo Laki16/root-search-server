@@ -34,8 +34,6 @@ namespace ApiServer.Controllers
 			Response.Headers.Add("Content-Type", "text/event-stream");
 			Response.StatusCode = 200;
 
-			await Response.Body.WriteAsync(Encoding.UTF8.GetBytes("event: result\n"));
-
 			ResultManager.Instance.AddConnection(Request.HttpContext.Connection.Id, keyword, Response);
 
 			try

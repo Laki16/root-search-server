@@ -179,6 +179,7 @@ namespace ApiServer
 			{
 				var builder = new StringBuilder();
 
+				builder.Append($"event: result\n");
 				builder.Append($"data:{JsonConvert.SerializeObject(result)}\n\n");
 
 				var message = Encoding.UTF8.GetBytes(builder.ToString());
