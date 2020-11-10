@@ -29,7 +29,7 @@ namespace Microsoft.Extensions.Primitive
 					normalized &= TryFilterNumeric(ref segment);
 
 					if (normalized && segment.Length > 0) {
-						scores.AddOrUpdate(segment, 1, (k, v) => v + 1);
+						scores.AddOrUpdate(segment, 1, (_, v) => v + 1);
 					}
 				}
 			}
