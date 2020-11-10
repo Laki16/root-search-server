@@ -68,6 +68,11 @@ namespace ApiServer
 		/// </summary>
 		private Action onCancel;
 
+		/// <summary>
+		/// 각 result의 시퀀스 아이디
+		/// </summary>
+		private int seqId = 0;
+
 		public ClientConnection(string secret, string reqKeyword, HttpResponse response, Action onCancel)
 		{
 			this.secret = secret;
@@ -148,10 +153,21 @@ namespace ApiServer
 
 				var result = await WorkerManager.Instance.GetResult(keyword);
 
+				// TODO: Replace to Pooled List
+				var wrappedResults = new List<SearchResultObjectWrapper>();
+
+				foreach (var resultObj in result.Results)
+				{
+					wrappedResults.Add(new SearchResultObjectWrapper(seqId, resultObj));
+
+					// auto increment seq id
+					seqId = unchecked(seqId + 1);
+				}
+
 				results.TryAdd(new SearchResultDTO
 				{
 					KeyWord = keyword,
-					Results = result.Results,
+					Results = wrappedResults,
 				});
 
 				// 연관 검색어들을 검색 타겟에 설정
