@@ -71,7 +71,7 @@ namespace ApiServer
 			listRequest.Q = keyword;
 			listRequest.Cx = cx;
 
-			Console.Write($"Start searching... {keyword}");
+			Console.WriteLine($"Search... {keyword}");
 
 			var items = listRequest.Execute().Items;
 
