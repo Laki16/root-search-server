@@ -4,7 +4,6 @@ using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Cors;
 using ApiServer.Models;
-using System.Text;
 
 namespace ApiServer.Controllers
 {
@@ -33,7 +32,12 @@ namespace ApiServer.Controllers
 			// Response.Headers.Add("Access-Control-Allow-Credentials", "true");
 			Response.Headers.Add("Content-Type", "text/event-stream");
 
-			if (ResultManager.Instance.TryAddConnection(Request.HttpContext.Connection.Id, keyword, Response))
+			Console.WriteLine(
+				$"{{{Request.HttpContext.Connection.Id}:{keyword}}} arrived."
+				+ $" RequestAborted: {Response.HttpContext.RequestAborted.IsCancellationRequested}");
+
+			if (ResultManager.Instance.TryAddConnection(
+				Request.HttpContext.Connection.Id, keyword, Response, out var connection))
 			{
 				Response.StatusCode = 200;
 			}
@@ -41,32 +45,23 @@ namespace ApiServer.Controllers
 			{
 				// Duplicated client secret error! Close connection and return.
 				Response.StatusCode = 502;
-
-				Response.Body.Close();
-
-				return;
 			}
 
 			try
 			{
-				while (!Response.HttpContext.RequestAborted.IsCancellationRequested)
+				while (!Response.HttpContext.RequestAborted.IsCancellationRequested && !connection.IsCancelled())
 				{
 					await Task.Delay(1000);
 				}
 			}
 			finally
 			{
+				connection.Cancel();
 				Response.Body.Close();
+
+				Console.WriteLine(
+					$"{{{Request.HttpContext.Connection.Id}:{keyword}}} closed. Status: {Response.StatusCode}");
 			}
-
-			// return Ok();
-			// var result = await WorkerManager.Instance.GetResult(keyword);
-
-			// return new SearchResultDTO
-			// {
-			// 	KeyWord = keyword,
-			// 	Results = result.Results,
-			// };
 		}
 	}
 }

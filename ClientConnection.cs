@@ -13,6 +13,22 @@ namespace ApiServer
 {
 	public class ClientConnection
 	{
+		private enum ConnectionStatus
+		{
+			/// <summary>
+			/// 닫힌 상태
+			/// </summary>
+			Closed = 0,
+			/// <summary>
+			/// 열려있는 상태
+			/// </summary>
+			Opened = 1,
+			/// <summary>
+			/// 확인이 필요한 상태
+			/// </summary>
+			Unidentified = 2,
+		}
+
 		/// <summary>
 		/// 검색 및 클라이언트 전송 작업의 텀(ms)
 		/// </summary>
@@ -90,7 +106,8 @@ namespace ApiServer
 
 			this.onCancel = onCancel;
 
-			Task.Run(async () => await Run(this.cancellationTokenSource.Token));
+			Task.Run(async () => await Run(this.cancellationTokenSource.Token).ConfigureAwait(false),
+				this.cancellationTokenSource.Token);
 		}
 
 		private async Task Run(CancellationToken cancellationToken)
@@ -100,38 +117,37 @@ namespace ApiServer
 				while (!cancellationToken.IsCancellationRequested)
 				{
 					var currentTime = DateTime.UtcNow;
-					var healthChecked = false;
+					var healthChecked = ConnectionStatus.Unidentified;
 
-					healthChecked |= await TrySearch();
+					healthChecked = await TrySearch();
 
-					healthChecked |= await TrySendDataToClient();
+					healthChecked = await TrySendDataToClient();
 
 					// 비동기 작업 수행중에 헬스체크가 되었다면 따로 진행하지 않고 이번 텀을 넘김
-					if (healthChecked)
+					if (healthChecked == ConnectionStatus.Opened)
 					{
 						lastHealthChecked = DateTime.UtcNow;
 					}
+					else if (healthChecked == ConnectionStatus.Closed)
+					{
+						break;
+					}
 					else if (DateTime.Compare(lastHealthChecked.AddSeconds(15), currentTime) < 0)
 					{
-						// need health check
+						if (IsCancelled())
+						{
+							break;
+						}
+
+						// health check
 						await response.Body.WriteAsync(Encoding.UTF8.GetBytes(":\n\n"));
 
-						if (response.HttpContext.RequestAborted.IsCancellationRequested)
-						{
-							Cancel();
-						}
-						else
-						{
-							lastHealthChecked = currentTime;
-						}
+						// 만약 헬스체크 실패했다면 다음 Run 수행중에 헬스체크 될 것.
+						lastHealthChecked = currentTime;
 					}
 
-					await Task.Delay(TaskRunDelay, cancellationToken).ConfigureAwait(false);
+					cancellationToken.WaitHandle.WaitOne(TaskRunDelay);
 				}
-			}
-			catch (Exception e)
-			{
-
 			}
 			finally
 			{
@@ -139,13 +155,13 @@ namespace ApiServer
 			}
 		}
 
-		public void Cancel()
+		private async Task<ConnectionStatus> TrySearch()
 		{
-			cancellationTokenSource.Cancel();
-		}
+			if (IsCancelled())
+			{
+				return ConnectionStatus.Closed;
+			}
 
-		private async Task<Boolean> TrySearch()
-		{
 			if (searchTargets.TryTake(out var keyword))
 			{
 				// 이미 검색한 키워드에 추가
@@ -167,7 +183,7 @@ namespace ApiServer
 				results.TryAdd(new SearchResultDTO
 				{
 					KeyWord = keyword,
-					Results = wrappedResults,
+					Results = wrappedResults
 				});
 
 				// 연관 검색어들을 검색 타겟에 설정
@@ -182,14 +198,19 @@ namespace ApiServer
 					searchTargets.TryAdd(associated);
 				}
 
-				return response.HttpContext.RequestAborted.IsCancellationRequested;
+				return IsCancelled() ? ConnectionStatus.Closed : ConnectionStatus.Opened;
 			}
 
-			return false;
+			return ConnectionStatus.Unidentified;
 		}
 
-		private async Task<Boolean> TrySendDataToClient()
+		private async Task<ConnectionStatus> TrySendDataToClient()
 		{
+			if (IsCancelled())
+			{
+				return ConnectionStatus.Closed;
+			}
+
 			// TODO: threshold 지정? 네트워크 부하가 크면 고려해보자
 			if (results.TryTake(out var result))
 			{
@@ -200,12 +221,24 @@ namespace ApiServer
 
 				var message = Encoding.UTF8.GetBytes(builder.ToString());
 
-				await response.Body.WriteAsync(message, 0, message.Length);
+				await response?.Body?.WriteAsync(message, 0, message.Length);
 
-				return response.HttpContext.RequestAborted.IsCancellationRequested;
+				return IsCancelled() ? ConnectionStatus.Closed : ConnectionStatus.Opened;
 			}
 
-			return false;
+			return ConnectionStatus.Unidentified;
+		}
+
+		public bool IsCancelled()
+		{
+			return cancellationTokenSource.IsCancellationRequested;
+		}
+
+		public void Cancel()
+		{
+			onCancel.Invoke();
+
+			cancellationTokenSource.Cancel();
 		}
 
 		public void Dispose()
