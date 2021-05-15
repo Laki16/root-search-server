@@ -23,7 +23,7 @@ namespace ApiServer
 			services.AddCors(options => {
 				options.AddPolicy("DevelopPolicy", builder => {
 					// builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
-					builder.WithOrigins("127.0.0.1:3000")
+					builder.WithOrigins("https://rootsearch.github.io")
 						.WithMethods("GET");
 				});
 			});
