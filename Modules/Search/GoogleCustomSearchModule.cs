@@ -119,7 +119,8 @@ namespace ApiServer
 				results.Add(new SearchResultObject
 				{
 					Title = item.Title,
-					Snippet = item.Snippet,
+					// Snippet이 비어있는 데이터는 Title로 대체
+					Snippet = item.Snippet ?? item.Title,
 					Link = item.Link,
 					Thumbnail = thumbnail
 				});

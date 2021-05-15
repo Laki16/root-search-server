@@ -104,15 +104,12 @@ namespace ApiServer
 				// TODO: use worker
 				foreach (var result in cached.Results)
 				{
-					// Snippet이 비어있는 경우가 있기에 체크
-					var targetData = result.Snippet ?? result.Title;
-
-					if (targetData == null)
+					if (result.Snippet == null)
 					{
 						continue;
 					}
 
-					var tokens = new StringTokenizer(targetData, Separators);
+					var tokens = new StringTokenizer(result.Snippet, Separators);
 
 					tokens.Score(ref scores);
 				}
