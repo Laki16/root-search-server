@@ -4,9 +4,10 @@ RootSearch server is a server for RootSearch search engine.
 
 # Requirements
 
-## .NET Core SDK 3.1 / Runtime 3.1
+## .NET 5.0 / .NET Runtime 5.0
 
-RootSearch server is in development on [.NET Core 3.1][dotnetcoresdk]
+RootSearch server is in development on [.NET 5.0][dotnetcoresdk]
+
 
 ## Redis 6.0
 
@@ -41,6 +42,9 @@ RootSearch depends on [Redis][redis].
 # Run
 
 ```bash
+# You can skip this step if you already migrated to .NET Core 3.1 to .NET 5.0
+dotnet nuget locals --clear all
+
 dotnet restore
 
 dotnet run apiserver
