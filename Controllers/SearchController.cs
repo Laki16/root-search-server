@@ -12,7 +12,7 @@ namespace ApiServer.Controllers
 	[Route("search")]
 	public class SearchController : ControllerBase
 	{
-		public SearchController(IOptions<SearchEngineApiSettings> apiSettingsAccessor, ICacheManager cache)
+		public SearchController(IOptions<SearchEngineApiSettings> apiSettingsAccessor, ICacheModule cache)
 		{
 			// init worker manager with dependencies injection.
 			WorkerManager.Instance.Initialize(apiSettingsAccessor.Value, cache);
@@ -62,6 +62,20 @@ namespace ApiServer.Controllers
 				Console.WriteLine(
 					$"{{{Request.HttpContext.Connection.Id}:{keyword}}} closed. Status: {Response.StatusCode}");
 			}
+		}
+
+		/// <summary>
+		/// Remove cached result in redis cache.
+		/// </summary>
+		/// <param name="keyword">remove target</param>
+		[HttpDelete("{keyword}")]
+		public async Task RemoveCachedResult(string keyword)
+		{
+			Console.WriteLine($"{{{Request.HttpContext.Connection.Id}:{keyword}}} remove requested.");
+
+			await WorkerManager.Instance.RemoveCachedResult(keyword);
+
+			Response.StatusCode = 200;
 		}
 	}
 }

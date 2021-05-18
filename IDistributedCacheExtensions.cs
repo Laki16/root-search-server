@@ -33,5 +33,10 @@ namespace Microsoft.Extensions.Caching.Distributed
 
 			await cache.SetAsync(key, encrypted, entryOptions);
 		}
+
+		public static async Task RemoveAsync(this IDistributedCache cache, string key)
+		{
+			await cache.RemoveAsync(key);
+		}
 	}
 }

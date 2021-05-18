@@ -39,7 +39,7 @@ namespace ApiServer
 			});
 
 			// Register custom cache dependency.
-			services.AddScoped<ICacheManager, CacheManager>();
+			services.AddScoped<ICacheModule, RedisCacheModule>();
 
 			// Register the search moudle configuration instance.
 			services.Configure<SearchEngineApiSettings>(

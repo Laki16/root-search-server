@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
@@ -23,7 +22,7 @@ namespace ApiServer
 		/// <summary>
 		/// redis distributed cache for search results
 		/// </summary>
-		private ICacheManager _cache;
+		private ICacheModule _cache;
 
 		/// <summary>
 		/// List of available search modules
@@ -32,7 +31,7 @@ namespace ApiServer
 
 		private static char[] Separators = new char[] { ' ' };
 
-		public void Initialize(SearchEngineApiSettings apiSettings, ICacheManager cache)
+		public void Initialize(SearchEngineApiSettings apiSettings, ICacheModule cache)
 		{
 			// inject IOptions
 			_apiSettings = apiSettings;
@@ -119,10 +118,15 @@ namespace ApiServer
 				cached.AssociativeWords = sorted.Take(5).Select(x => x.Key).ToList();
 
 				// TODO: search failed handling
-				_cache.SetAsync(keyword, cached);
+				await _cache.SetAsync(keyword, cached);
 			}
 
 			return cached;
+		}
+
+		public async Task RemoveCachedResult(string keyword)
+		{
+			await _cache.RemoveAsync(keyword);
 		}
 	}
 }
