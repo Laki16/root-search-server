@@ -63,5 +63,19 @@ namespace ApiServer.Controllers
 					$"{{{Request.HttpContext.Connection.Id}:{keyword}}} closed. Status: {Response.StatusCode}");
 			}
 		}
+
+		/// <summary>
+		/// Remove cached result in redis cache.
+		/// </summary>
+		/// <param name="keyword">remove target</param>
+		[HttpDelete("{keyword}")]
+		public async Task RemoveCachedResult(string keyword)
+		{
+			Console.WriteLine($"{{{Request.HttpContext.Connection.Id}:{keyword}}} remove requested.");
+
+			await WorkerManager.Instance.RemoveCachedResult(keyword);
+
+			Response.StatusCode = 200;
+		}
 	}
 }
