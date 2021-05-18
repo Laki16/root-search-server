@@ -12,7 +12,7 @@ namespace ApiServer.Controllers
 	[Route("search")]
 	public class SearchController : ControllerBase
 	{
-		public SearchController(IOptions<SearchEngineApiSettings> apiSettingsAccessor, ICacheManager cache)
+		public SearchController(IOptions<SearchEngineApiSettings> apiSettingsAccessor, ICacheModule cache)
 		{
 			// init worker manager with dependencies injection.
 			WorkerManager.Instance.Initialize(apiSettingsAccessor.Value, cache);
