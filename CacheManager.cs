@@ -19,7 +19,7 @@ namespace ApiServer
 			return await _cache.GetAsync<SearchResultCache>(key);
 		}
 
-		public async void SetAsync(string key, SearchResultCache result)
+		public async Task SetAsync(string key, SearchResultCache result)
 		{
 			await _cache.SetAsync<SearchResultCache>(key, result);
 		}

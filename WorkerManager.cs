@@ -119,7 +119,7 @@ namespace ApiServer
 				cached.AssociativeWords = sorted.Take(5).Select(x => x.Key).ToList();
 
 				// TODO: search failed handling
-				_cache.SetAsync(keyword, cached);
+				await _cache.SetAsync(keyword, cached);
 			}
 
 			return cached;

@@ -8,6 +8,6 @@ namespace ApiServer
 	{
 		Task<SearchResultCache> GetAsync(string key);
 
-		void SetAsync(string key, SearchResultCache result);
+		Task SetAsync(string key, SearchResultCache result);
 	}
 }
