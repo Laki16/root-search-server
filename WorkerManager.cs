@@ -109,7 +109,7 @@ namespace ApiServer
 				}
 
 				// 가장 오래된 블록 키워드 갱신
-				if (oldest == null || blocked[oldest].CompareTo(expireAt) < 0)
+				if (oldest == null || blocked[oldest].CompareTo(expireAt) > 0)
 				{
 					oldest = keyword;
 				}
@@ -137,20 +137,13 @@ namespace ApiServer
 
 			var oldest = RefreshBlockedKeywords(ref blocked);
 
-			if (blocked.TryGetValue(blockKeyword, out var exist))
-			{
-				// 만료 시각 갱신
-				exist = DateTime.Now + Constants.blockExpireAfter;
-			}
-			else
-			{
-				// 최대 블럭 개수에 도달하면 가장 오래된 키워드를 해제한다.
-				if (blocked.Count >= Constants.MaxBlockedWords)
-				{
-					blocked.Remove(oldest);
-				}
+			// 만료 기한 갱신
+			blocked[blockKeyword] = DateTime.Now + Constants.blockExpireAfter;
 
-				blocked[blockKeyword] = DateTime.Now + Constants.blockExpireAfter;
+			// 최대 블럭 개수에 도달하면 가장 오래된 키워드를 해제한다.
+			if (blocked.Count > Constants.MaxBlockedWords)
+			{
+				blocked.Remove(oldest);
 			}
 
 			cached.BlockedWords = blocked;
