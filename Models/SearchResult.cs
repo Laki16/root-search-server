@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace ApiServer.Models
@@ -91,6 +92,11 @@ namespace ApiServer.Models
 		public List<string> AssociativeWords { get; set; }
 
 		/// <summary>
+		/// 부적절한 연관 검색어
+		/// </summary>
+		public Dictionary<string, DateTime> BlockedWords { get; set; }
+
+		/// <summary>
 		/// 검색 결과
 		/// </summary>
 		public List<SearchResultObject> Results { get; set; }
@@ -107,5 +113,22 @@ namespace ApiServer.Models
 		/// 검색 결과
 		/// </summary>
 		public List<SearchResultObjectWrapper> Results { get; set; }
+	}
+
+	/// <summary>
+	/// 부적절한 연관 검색어 클래스
+	/// </summary>
+	public class InappropriateKeyword
+	{
+		/// <summary>
+		/// 검색한 키워드
+		/// </summary>
+		public string SearchKeyword { get; set; }
+
+		/// <summary>
+		/// 부적절한 연관 검색어
+		/// </summary>
+		/// <value></value>
+		public string BlockKeyword { get; set; }
 	}
 }

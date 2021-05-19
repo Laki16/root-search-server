@@ -55,6 +55,11 @@ namespace ApiServer
 		private readonly HashSet<string> searchedKeywords;
 
 		/// <summary>
+		/// 블럭된 연관 검색어 목록
+		/// </summary>
+		private readonly HashSet<string> blockedKeywords;
+
+		/// <summary>
 		/// 커넥션 HttpResponse
 		/// </summary>
 		private readonly HttpResponse response;
@@ -101,6 +106,8 @@ namespace ApiServer
 			this.searchTargets.TryAdd(reqKeyword);
 
 			this.searchedKeywords = new HashSet<string>();
+
+			this.blockedKeywords = new HashSet<string>();
 
 			this.cancellationTokenSource = new CancellationTokenSource();
 
@@ -186,11 +193,14 @@ namespace ApiServer
 					Results = wrappedResults
 				});
 
+				// 블럭된 키워드 추가
+				blockedKeywords.UnionWith(result.BlockedWords.Keys);
+
 				// 연관 검색어들을 검색 타겟에 설정
 				foreach (var associated in result.AssociativeWords)
 				{
-					// 이미 검색된 키워드는 제외
-					if (searchedKeywords.Contains(associated))
+					// 이미 검색된 키워드와 블럭된 키워드는 제외
+					if (searchedKeywords.Contains(associated) || blockedKeywords.Contains(associated))
 					{
 						continue;
 					}

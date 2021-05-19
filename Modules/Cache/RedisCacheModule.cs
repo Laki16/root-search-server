@@ -5,11 +5,11 @@ using ApiServer.Models;
 
 namespace ApiServer
 {
-	public class CacheManager : ICacheManager
+	public class RedisCacheModule : ICacheModule
 	{
 		private readonly IDistributedCache _cache;
 
-		public CacheManager(IDistributedCache distributedCache)
+		public RedisCacheModule(IDistributedCache distributedCache)
 		{
 			_cache = distributedCache;
 		}
@@ -19,9 +19,14 @@ namespace ApiServer
 			return await _cache.GetAsync<SearchResultCache>(key);
 		}
 
-		public async void SetAsync(string key, SearchResultCache result)
+		public async Task SetAsync(string key, SearchResultCache result)
 		{
 			await _cache.SetAsync<SearchResultCache>(key, result);
+		}
+
+		public async Task RemoveAsync(string key)
+		{
+			await _cache.RemoveAsync(key);
 		}
 	}
 }

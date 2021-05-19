@@ -12,7 +12,7 @@ namespace ApiServer.Controllers
 	[Route("search")]
 	public class SearchController : ControllerBase
 	{
-		public SearchController(IOptions<SearchEngineApiSettings> apiSettingsAccessor, ICacheManager cache)
+		public SearchController(IOptions<SearchEngineApiSettings> apiSettingsAccessor, ICacheModule cache)
 		{
 			// init worker manager with dependencies injection.
 			WorkerManager.Instance.Initialize(apiSettingsAccessor.Value, cache);
@@ -27,9 +27,6 @@ namespace ApiServer.Controllers
 		{
 			Response.Headers.Add("Connection", "keep-alive");
 			Response.Headers.Add("Cache-Control", "no-cache");
-			Response.Headers.Add("Access-Control-Allow-Origin", "127.0.0.1:3000");
-			Response.Headers.Add("Access-Control-Allow-Methods", "GET");
-			// Response.Headers.Add("Access-Control-Allow-Credentials", "true");
 			Response.Headers.Add("Content-Type", "text/event-stream");
 
 			Console.WriteLine(
@@ -62,6 +59,35 @@ namespace ApiServer.Controllers
 				Console.WriteLine(
 					$"{{{Request.HttpContext.Connection.Id}:{keyword}}} closed. Status: {Response.StatusCode}");
 			}
+		}
+
+		/// <summary>
+		/// Block inappropriate associated keywords from parent keyword.
+		/// </summary>
+		[HttpPut("block")]
+		public async Task BlockInappropriateKeywords(InappropriateKeyword keyword)
+		{
+			Console.WriteLine(
+				$"{Request.HttpContext.Connection.Id} - block requested."
+				+ $"{{search={keyword.SearchKeyword}, block={keyword.BlockKeyword}}}");
+
+			await WorkerManager.Instance.BlockAssociativeKeyword(keyword.SearchKeyword, keyword.BlockKeyword);
+
+			Response.StatusCode = 200;
+		}
+
+		/// <summary>
+		/// Remove cached result in redis cache.
+		/// </summary>
+		/// <param name="keyword">remove target</param>
+		[HttpDelete("{keyword}")]
+		public async Task RemoveCachedResult(string keyword)
+		{
+			Console.WriteLine($"{{{Request.HttpContext.Connection.Id}:{keyword}}} remove requested.");
+
+			await WorkerManager.Instance.RemoveCachedResult(keyword);
+
+			Response.StatusCode = 200;
 		}
 	}
 }

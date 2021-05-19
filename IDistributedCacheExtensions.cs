@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.Text;
+using ApiServer;
 
 namespace Microsoft.Extensions.Caching.Distributed
 {
@@ -24,14 +25,19 @@ namespace Microsoft.Extensions.Caching.Distributed
 			// decide cache entry options
 			var entryOptions = options ??
 				new DistributedCacheEntryOptions()
-					.SetAbsoluteExpiration(DateTime.Now.AddHours(10))
-					.SetSlidingExpiration(TimeSpan.FromHours(5));
+					.SetAbsoluteExpiration(DateTime.Now.AddHours(Constants.RedisAbsoluteExpiration))
+					.SetSlidingExpiration(TimeSpan.FromHours(Constants.RedisSlidingExpiration));
 
 			var serializedResult = JsonConvert.SerializeObject(value);
 
 			var encrypted = Encoding.UTF8.GetBytes(serializedResult);
 
 			await cache.SetAsync(key, encrypted, entryOptions);
+		}
+
+		public static async Task RemoveAsync(this IDistributedCache cache, string key)
+		{
+			await cache.RemoveAsync(key);
 		}
 	}
 }

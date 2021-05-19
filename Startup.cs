@@ -23,8 +23,9 @@ namespace ApiServer
 			services.AddCors(options => {
 				options.AddPolicy("DevelopPolicy", builder => {
 					// builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
-					builder.WithOrigins("127.0.0.1:3000")
-						.WithMethods("GET");
+					builder.WithOrigins("https://rootsearch.github.io")
+						.WithHeaders("Content-Type")
+						.WithMethods("GET", "PUT", "DELETE");
 				});
 			});
 
@@ -39,7 +40,7 @@ namespace ApiServer
 			});
 
 			// Register custom cache dependency.
-			services.AddScoped<ICacheManager, CacheManager>();
+			services.AddScoped<ICacheModule, RedisCacheModule>();
 
 			// Register the search moudle configuration instance.
 			services.Configure<SearchEngineApiSettings>(

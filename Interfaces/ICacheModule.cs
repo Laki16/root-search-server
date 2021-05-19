@@ -1,13 +1,14 @@
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using ApiServer.Models;
 
 namespace ApiServer
 {
-	public interface ICacheManager
+	public interface ICacheModule
 	{
 		Task<SearchResultCache> GetAsync(string key);
 
-		void SetAsync(string key, SearchResultCache result);
+		Task SetAsync(string key, SearchResultCache result);
+
+		Task RemoveAsync(string key);
 	}
 }
