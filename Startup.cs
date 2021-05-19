@@ -24,7 +24,8 @@ namespace ApiServer
 				options.AddPolicy("DevelopPolicy", builder => {
 					// builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
 					builder.WithOrigins("https://rootsearch.github.io")
-						.WithMethods("GET");
+						.WithHeaders("Content-Type")
+						.WithMethods("GET", "PUT", "DELETE");
 				});
 			});
 
