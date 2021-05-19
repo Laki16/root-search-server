@@ -107,6 +107,8 @@ namespace ApiServer
 
 			this.searchedKeywords = new HashSet<string>();
 
+			this.blockedKeywords = new HashSet<string>();
+
 			this.cancellationTokenSource = new CancellationTokenSource();
 
 			this.onCancel = onCancel;
