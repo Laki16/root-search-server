@@ -189,8 +189,8 @@ namespace ApiServer
 				// 연관 검색어들을 검색 타겟에 설정
 				foreach (var associated in result.AssociativeWords)
 				{
-					// 이미 검색된 키워드는 제외
-					if (searchedKeywords.Contains(associated))
+					// 이미 검색된 키워드와 블럭된 키워드는 제외
+					if (searchedKeywords.Contains(associated) || result.BlockedWords.ContainsKey(associated))
 					{
 						continue;
 					}

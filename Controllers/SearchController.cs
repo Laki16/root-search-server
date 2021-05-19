@@ -62,6 +62,21 @@ namespace ApiServer.Controllers
 		}
 
 		/// <summary>
+		/// Block inappropriate associated keywords from parent keyword.
+		/// </summary>
+		[HttpPut("block")]
+		public async Task BlockInappropriateKeywords(InappropriateKeyword keyword)
+		{
+			Console.WriteLine(
+				$"{Request.HttpContext.Connection.Id} - block requested."
+				+ $"{{search={keyword.SearchKeyword}, block={keyword.BlockKeyword}}}");
+
+			await WorkerManager.Instance.BlockAssociativeKeyword(keyword.SearchKeyword, keyword.BlockKeyword);
+
+			Response.StatusCode = 200;
+		}
+
+		/// <summary>
 		/// Remove cached result in redis cache.
 		/// </summary>
 		/// <param name="keyword">remove target</param>
