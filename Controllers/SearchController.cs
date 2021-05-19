@@ -27,9 +27,6 @@ namespace ApiServer.Controllers
 		{
 			Response.Headers.Add("Connection", "keep-alive");
 			Response.Headers.Add("Cache-Control", "no-cache");
-			Response.Headers.Add("Access-Control-Allow-Origin", "127.0.0.1:3000");
-			Response.Headers.Add("Access-Control-Allow-Methods", "GET");
-			// Response.Headers.Add("Access-Control-Allow-Credentials", "true");
 			Response.Headers.Add("Content-Type", "text/event-stream");
 
 			Console.WriteLine(
