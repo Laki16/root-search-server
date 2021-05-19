@@ -137,7 +137,7 @@ namespace ApiServer
 
 			var oldest = RefreshBlockedKeywords(ref blocked);
 
-			if (cached.BlockedWords.TryGetValue(blockKeyword, out var exist))
+			if (blocked.TryGetValue(blockKeyword, out var exist))
 			{
 				// 만료 시각 갱신
 				exist = DateTime.Now + Constants.blockExpireAfter;
@@ -145,12 +145,12 @@ namespace ApiServer
 			else
 			{
 				// 최대 블럭 개수에 도달하면 가장 오래된 키워드를 해제한다.
-				if (cached.BlockedWords.Count > Constants.MaxBlockedWords)
+				if (blocked.Count > Constants.MaxBlockedWords)
 				{
-					cached.BlockedWords.Remove(oldest);
+					blocked.Remove(oldest);
 				}
 
-				cached.BlockedWords[blockKeyword] = DateTime.Now + Constants.blockExpireAfter;
+				blocked[blockKeyword] = DateTime.Now + Constants.blockExpireAfter;
 			}
 
 			cached.BlockedWords = blocked;
