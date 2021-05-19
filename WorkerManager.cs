@@ -145,7 +145,7 @@ namespace ApiServer
 			else
 			{
 				// 최대 블럭 개수에 도달하면 가장 오래된 키워드를 해제한다.
-				if (blocked.Count > Constants.MaxBlockedWords)
+				if (blocked.Count >= Constants.MaxBlockedWords)
 				{
 					blocked.Remove(oldest);
 				}
