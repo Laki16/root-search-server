@@ -69,7 +69,7 @@ TODO: docker compose
 
 #### .NET standalone (without docker)
 ```bash
-# You can skip this step if you already migrated to .NET Core 3.1 to .NET 5.0
+# You can skip this step if you already migrated from .NET Core 3.1 to .NET 5.0
 dotnet nuget locals --clear all
 
 dotnet restore
