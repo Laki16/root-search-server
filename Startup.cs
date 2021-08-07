@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Cors;
 using ApiServer.Models;
+using System;
 
 namespace ApiServer
 {
@@ -33,10 +34,16 @@ namespace ApiServer
 
 			// Register the redis cache.
 			services.AddStackExchangeRedisCache(options => {
-				var redisSettings = Configuration.GetSection("RedisSettings");
+				// var redisSettings = Configuration.GetSection("RedisSettings");
 
-				options.Configuration = $"{redisSettings.GetValue<string>("Host")}:{redisSettings.GetValue<string>("Port")}";
-				options.InstanceName = redisSettings.GetValue<string>("InstanceName");
+				// options.Configuration = $"{redisSettings.GetValue<string>("Host")}:{redisSettings.GetValue<string>("Port")}";
+				// options.InstanceName = redisSettings.GetValue<string>("InstanceName");
+
+				// Changed for heroku deploy.
+				var redisUri = new Uri(Environment.GetEnvironmentVariable("REDIS_URL"));
+				var userInfo = redisUri.UserInfo.Split(':');
+
+				options.Configuration = $"{redisUri.Host}:{redisUri.Port},password={userInfo[1]}";
 			});
 
 			// Register custom cache dependency.
@@ -56,7 +63,8 @@ namespace ApiServer
 				app.UseDeveloperExceptionPage();
 			}
 
-			app.UseHttpsRedirection();
+			// Using heroku ssl instead.
+			// app.UseHttpsRedirection();
 
 			app.UseRouting();
 
