@@ -31,7 +31,8 @@ namespace ApiServer.Controllers
 
 			Console.WriteLine(
 				$"{{{Request.HttpContext.Connection.Id}:{keyword}}} arrived."
-				+ $" RequestAborted: {Response.HttpContext.RequestAborted.IsCancellationRequested}");
+				+ $" RequestAborted: {Response.HttpContext.RequestAborted.IsCancellationRequested}"
+				+ $" {DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")}");
 
 			if (ResultManager.Instance.TryAddConnection(
 				Request.HttpContext.Connection.Id, keyword, Response, out var connection))
@@ -69,7 +70,8 @@ namespace ApiServer.Controllers
 		{
 			Console.WriteLine(
 				$"{Request.HttpContext.Connection.Id} - block requested."
-				+ $"{{search={keyword.SearchKeyword}, block={keyword.BlockKeyword}}}");
+				+ $"{{search={keyword.SearchKeyword}, block={keyword.BlockKeyword}}}"
+				+ $" {DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")}");
 
 			await WorkerManager.Instance.BlockAssociativeKeyword(keyword.SearchKeyword, keyword.BlockKeyword);
 
@@ -83,7 +85,9 @@ namespace ApiServer.Controllers
 		[HttpDelete("{keyword}")]
 		public async Task RemoveCachedResult(string keyword)
 		{
-			Console.WriteLine($"{{{Request.HttpContext.Connection.Id}:{keyword}}} remove requested.");
+			Console.WriteLine(
+				$"{{{Request.HttpContext.Connection.Id}:{keyword}}} remove requested."
+				+ $" {DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")}");
 
 			await WorkerManager.Instance.RemoveCachedResult(keyword);
 
