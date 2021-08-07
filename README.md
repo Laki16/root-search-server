@@ -25,7 +25,7 @@ RootSearch can also running on [Docker][docker].
 
 `appsettings.json` example.
 
-## Environment configuration
+## Environment configuration (AWS, ElastiCache)
 
 ```json
 {
@@ -55,16 +55,44 @@ RootSearch can also running on [Docker][docker].
 }
 ```
 
+## Environment configuration (Heroku)
+
+```json
+{
+  "SearchEngineApiSettings": {
+    "GoogleCustomSearchApiSettings": {
+      "ApiKey": "Google custom search api key",
+      "Cx": "Google Custom search engine ID"
+    }
+  }
+}
+```
+
 
 # Run
 
-#### Docker
+#### Docker (AWS)
 ```bash
 docker build -t {image name} .
 
 docker run --name {container name} -d -p {hostPort:innerPort} {image name}
 
 TODO: docker compose
+```
+
+#### Docker (Heroku)
+```bash
+# see https://dev.to/alrobilliard/deploying-net-core-to-heroku-1lfe
+heroku container:login
+
+docker build -t {image name} .
+
+heroku container:push -a {image name} web
+
+heroku container:release -a {image name} web
+
+# for logs
+heroku logs --app {image name} --tail
 ```
 
 #### .NET standalone (without docker)
